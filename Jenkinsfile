@@ -28,6 +28,8 @@ pipeline{
             }
             steps {
                 sh 'mvn clean package'
+                sh 'cp /var/jenkins_home/workspace/dsljobs/javabuild@2/target/*.war /var/jenkins_home/workspace/dsljobs/javabuild/'
+                sh 'pwd; grep -i *.war'
             }
         }
         stage("Build Docker image") {
