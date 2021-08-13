@@ -31,7 +31,7 @@ pipeline{
         }
         stage("Build Docker image"){
             steps{
-              dockerbuild "${params.name}","${params.tag}"
+              docker build -t dockerbuild "${name}" .
             }
         }
     }
