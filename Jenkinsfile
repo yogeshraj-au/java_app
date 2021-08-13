@@ -9,7 +9,7 @@ pipeline{
     }
 
     parameters {
-        string(defaultValue: "yogeshraj292", description: 'repos name', name: 'name')
+        string(defaultValue: "yogeshraj292", description: 'repo name', name: 'name')
         string(defaultValue: "1.0", description: 'which version?', name: 'tag')
     }
 
