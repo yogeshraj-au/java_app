@@ -10,6 +10,7 @@ pipeline{
 
     parameters {
         string(defaultValue: "yogeshraj292", description: 'repo name', name: 'name')
+        string(defaultValue: "javaapp", description: 'repo name', name: 'appname')
         string(defaultValue: "1.0", description: 'which version?', name: 'tag')
     }
 
@@ -31,7 +32,15 @@ pipeline{
         }
         stage("Build Docker image") {
             steps {
-                sh "docker build -t dockerbuild ${params.name}/${params.tag} ."
+                sh "docker build -t ${params.name}/${params.appname}:${params.tag} ."
+            }
+        }
+        stage("Push Docker image to registry") {
+            withCredentials([usernameColonPassword(credentialsId: '51a4ae27-73ea-475c-8fbf-9dc5550980bc', variable: '')]) {
+            sh "docker login -u ${username} -p ${password}"
+            }
+            steps {
+                sh "docker push ${params.name}/${params.appname}:${params.tag}"
             }
         }
     }
