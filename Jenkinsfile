@@ -32,6 +32,7 @@ pipeline{
         }
         stage("Build Docker image") {
             steps {
+                sh 'pwd'
                 sh "docker build -t ${params.name}/${params.appname}:${params.tag} ."
             }
         }
