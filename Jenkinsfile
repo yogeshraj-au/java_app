@@ -36,10 +36,10 @@ pipeline{
             }
         }
         stage("Push Docker image to registry") {
-            withCredentials([usernameColonPassword(credentialsId: '51a4ae27-73ea-475c-8fbf-9dc5550980bc', variable: '')]) {
-            sh "docker login -u ${username} -p ${password}"
-            }
             steps {
+                withCredentials([usernameColonPassword(credentialsId: '51a4ae27-73ea-475c-8fbf-9dc5550980bc', variable: '')]) {
+                sh "docker login -u ${username} -p ${password}"
+                 }
                 sh "docker push ${params.name}/${params.appname}:${params.tag}"
             }
         }
