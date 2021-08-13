@@ -1,5 +1,17 @@
+@Library('shared_library') _
+
 pipeline{
     agent any
+
+    options {
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '1'))
+    }
+
+    parameters {
+        string(defaultValue: "yogeshraj292", description: 'repos name', name: 'name')
+        string(defaultValue: "1.0", description: 'which version?', name: 'tag')
+    }
 
     stages{
         stage("checkout"){
@@ -19,7 +31,7 @@ pipeline{
         }
         stage("Build Docker image"){
             steps{
-               echo "build is done"
+              dockerbuild "${params.name}","${params.tag}"
             }
         }
     }
