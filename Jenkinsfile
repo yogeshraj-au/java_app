@@ -33,7 +33,7 @@ pipeline{
         }
         stage("Build Docker image") {
             steps {
-                sh "docker build -t ${params.name}/${params.appname}:${params.tag} ."
+                sh "docker build -t ${params.name}/${params.appname}:${BUILD_NUMBER} ."
             }
         }
         stage("Push Docker image to registry") {
@@ -41,7 +41,7 @@ pipeline{
                 withCredentials([usernamePassword(credentialsId: '51a4ae27-73ea-475c-8fbf-9dc5550980bc', passwordVariable: 'dockerpassword', usernameVariable: 'dockerusername')]) {
                 sh "docker login -u ${dockerusername} -p ${dockerpassword}"
                  }
-                sh "docker push ${params.name}/${params.appname}:${params.tag}"
+                sh "docker push ${params.name}/${params.appname}:${BUILD_NUMBER}"
             }
         }
     }
