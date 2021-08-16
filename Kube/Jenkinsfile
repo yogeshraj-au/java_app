@@ -54,6 +54,11 @@ spec:
         stage("checkout") {
             steps {
                 git credentialsId: 'ef28acbe-2b70-4d27-bc4e-e705887d4a85', url: 'https://github.com/yogeshraj-au/java_app.git'
+                branch = repo.GIT_BRANCH.take(20).replaceAll('/', '_')
+                    if (branch != 'master') {
+                        revision += "-${branch}"
+                    }
+                    sh "echo 'Building revision: ${BUILD_NUMBER}'"
             }
         }
         stage ('compile') {
