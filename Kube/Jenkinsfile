@@ -122,6 +122,11 @@ spec:
                     branch == 'master' || params.DEPLOY_BRANCH_TO_TST
                 }
             }
+            agent {
+                docker {
+                    image: 'bitnami/kubectl'
+                }
+            }
             steps {
                 sh 'echo Deploy to dev environment'
                 kubernetesDeploy kubeconfigId: 'kubefile', configs: 'k8s/deployment.yml'
