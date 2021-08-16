@@ -124,7 +124,7 @@ spec:
             }
             steps {
                 sh 'echo Deploy to dev environment'
-                kubernetesDeploy kubeconfigId: 'kubefile', configs: 'k8s/deployment.yaml'
+                kubernetesDeploy kubeconfigId: 'kubefile', configs: 'k8s/deployment.yml'
             }
         }
     }
