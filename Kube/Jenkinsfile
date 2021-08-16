@@ -116,5 +116,15 @@ spec:
                    }
             }
         }
+        stage ('deploy to env') {
+            when {
+                expression {
+                    branch == 'master' || params.DEPLOY_BRANCH_TO_TST
+                }
+            }
+            steps {
+                sh 'echo Deploy to dev environment'
+            }
+        }
     }
 }
