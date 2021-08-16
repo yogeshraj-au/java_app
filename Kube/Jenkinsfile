@@ -117,8 +117,6 @@ spec:
             }
         }
         stage ('deploy to env') {
-            agent any
-
             when {
                 expression {
                     branch == 'master' || params.DEPLOY_BRANCH_TO_TST
@@ -127,7 +125,7 @@ spec:
             steps {
                 checkout scm
                 sh 'echo Deploy to dev environment'
-                kubernetesDeploy kubeconfigId: 'kubefile', configs: 'k8s/deployment.yaml'
+                kubernetesDeploy kubeconfigId: 'kubefile', configs: 'k8s/deployment.yml'
             }
         }
     }
