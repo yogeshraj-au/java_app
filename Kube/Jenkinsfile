@@ -118,8 +118,10 @@ spec:
         }
         stage ('deploy to env') {
             agent any {
+
                 
             }
+
             when {
                 expression {
                     branch == 'master' || params.DEPLOY_BRANCH_TO_TST
@@ -130,5 +132,6 @@ spec:
                 kubernetesDeploy kubeconfigId: 'kubefile', configs: 'k8s/deployment.yml'
             }
         }
+    }
     }
 }
