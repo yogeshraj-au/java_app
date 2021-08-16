@@ -1,0 +1,109 @@
+pipeline {
+
+    agent {
+        kubernetes {
+            label 'build-service-pod'
+            defaultContainer 'jnlp'
+            yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    job: build-service
+spec:
+  containers:
+  - name: maven
+    image: maven:3.8.1-adoptopenjdk-11
+    command: ["cat"]
+    tty: true
+    volumeMounts:
+    - name: repository
+      mountPath: /root/.m2/repository
+  - name: docker
+    image: docker:18.09.2
+    command: ["cat"]
+    tty: true
+    volumeMounts:
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
+  volumes:
+  - name: repository
+    persistentVolumeClaim:
+      claimName: repository
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
+"""
+        }
+    }
+    options {
+        skipDefaultCheckout true
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '1'))
+    }
+
+    parameters {
+        string(defaultValue: "yogeshraj292", description: 'repo name', name: 'name')
+        string(defaultValue: "javaapp", description: 'repo name', name: 'appname')
+        string(defaultValue: "1.0", description: 'which version?', name: 'tag')
+        booleanParam(defaultValue: true, description: 'true or false to deploy', name: 'DEPLOY_BRANCH_TO_TST')
+                                
+    }
+
+    stages{
+        stage("checkout") {
+            steps {
+                git credentialsId: 'ef28acbe-2b70-4d27-bc4e-e705887d4a85', url: 'https://github.com/yogeshraj-au/java_app.git'
+            }
+        }
+        stage ('compile') {
+            steps {
+                container('maven') {
+                    sh 'mvn clean compile test-compile'
+                    // sh 'cp /var/jenkins_home/workspace/dsljobs/javabuild@2/target/*.war /var/jenkins_home/workspace/dsljobs/javabuild/'
+                }
+            }
+        }
+        stage ('unit test') {
+            steps {
+                container('maven') {
+                    sh 'mvn test'
+                }
+            }
+        }
+        stage ('integration test') {
+            steps {
+                container ('maven') {
+                    sh 'mvn verify'
+                }
+            }
+        }
+        
+        stage("Build Docker image") {
+            steps {
+                container('maven') {
+                    sh "mvn package -Dmaven.test.skip -Drevision=${BUILD_NUMBER}"
+                }
+                container('docker') {
+                    script {
+                        // registryIp = sh(script: 'getent hosts registry.kube-system | awk \'{ print $1 ; exit }\'', returnStdout: true).trim()
+                        sh "docker build -t ${params.name}/${params.appname}:${BUILD_NUMBER} ."
+                    }
+                }
+            }
+        }
+        stage ('publish artifact') {
+            when {
+                expression {
+                    branch == 'master' || params.DEPLOY_BRANCH_TO_TST
+                }
+            }
+            steps {
+                   withCredentials([usernamePassword(credentialsId: '51a4ae27-73ea-475c-8fbf-9dc5550980bc', passwordVariable: 'dockerpassword', usernameVariable: 'dockerusername')]) {
+                container('docker') {
+                    sh "docker login -u ${dockerusername} -p ${dockerpassword}"    
+                    sh "docker push ${params.name}/${params.appname}:${env.BUILD_NUMBER}"
+                }
+                   }
+            }
+        }
