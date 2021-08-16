@@ -117,10 +117,8 @@ spec:
             }
         }
         stage ('deploy to env') {
-            agent {
-                docker {
-                    image 'bitnami/kubectl'
-                }
+            agent any {
+                
             }
             when {
                 expression {
