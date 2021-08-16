@@ -17,8 +17,8 @@ spec:
       labels:
         app: javaapp
     spec:
-      containers:
-      - image: kammana/javaapp:3cab242
+      container:
+      - image: yogeshraj292/javaapp:10
         name: javaapp
         ports:
-        - containerPort: 8080
+        - containerPort: 8060
