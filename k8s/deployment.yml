@@ -17,7 +17,7 @@ spec:
       labels:
         app: javaapp
     spec:
-      container:
+      containers:
       - image: yogeshraj292/javaapp:10
         name: javaapp
         ports:
